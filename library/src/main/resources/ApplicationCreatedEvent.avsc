@@ -1,0 +1,40 @@
+{
+    "type" : "record",
+    "name" : "ApplicationCreatedEvent",
+    "namespace" : "com.tvmsoftware.eventslibrary",
+    "fields" : [ {
+      "name" : "applicationType",
+      "type" : [ "null", {
+        "type" : "enum",
+        "name" : "ApplicationType",
+        "symbols" : [ "SMALL_BUSINESS", "COMMERCIAL" ]
+      } ]
+    }, {
+      "name" : "correlationId",
+      "type" : [ "null", "string" ]
+    }, {
+      "name" : "id",
+      "type" : "string"
+    }, {
+      "name" : "numberOfApplicants",
+      "type" : [ "null", {
+        "type" : "int",
+        "java-class" : "java.lang.Integer"
+      } ]
+    }, {
+      "name" : "resourceId",
+      "type" : "string"
+    }, {
+      "name" : "source",
+      "type" : "string"
+    }, {
+      "name" : "time",
+      "type" : "string"
+    }, {
+      "name" : "type",
+      "type" : "string"
+    }, {
+      "name" : "userId",
+      "type" : [ "null", "string" ]
+    } ]
+  }

@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "events.source",
+      "type": "java.lang.String",
+      "description": "Description for events.source."
+  }
+] }
