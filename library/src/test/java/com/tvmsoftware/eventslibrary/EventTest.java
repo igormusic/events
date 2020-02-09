@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 class EventTest {
     @Test
     public void create_schema_for_custom_event(){
-        String avroSchema = Event.generateAvroSchema(ApplicationCreatedEvent.class);
+        String avroSchema = Event.generateAvroSchema(ApplicationCreatedEvent.class).toString(true);
 
         assertThat(avroSchema, is(not(emptyString())));
     }
