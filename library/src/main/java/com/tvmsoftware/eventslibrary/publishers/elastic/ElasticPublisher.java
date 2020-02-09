@@ -3,22 +3,22 @@ package com.tvmsoftware.eventslibrary.publishers.elastic;
 import com.tvmsoftware.eventslibrary.model.Event;
 import com.tvmsoftware.eventslibrary.EventPublisher;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.common.xcontent.XContentType;
-import org.springframework.data.elasticsearch.client.reactive.ReactiveElasticsearchClient;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.RestClient;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
+import org.elasticsearch.client.Request;
 
-import static org.elasticsearch.action.support.WriteRequest.RefreshPolicy.IMMEDIATE;
+import java.io.IOException;
+
 
 @Service
 @Slf4j
 public class ElasticPublisher implements EventPublisher {
 
     public static String ELASTIC_INDEX = "events";
-    private final ReactiveElasticsearchClient client;
+    private final RestClient client;
 
-    public ElasticPublisher(ReactiveElasticsearchClient client) {
+    public ElasticPublisher(RestClient client) {
         this.client = client;
     }
 
@@ -30,19 +30,18 @@ public class ElasticPublisher implements EventPublisher {
     @Override
     public <T extends Event> void publish(T event) {
 
-        String jsonObject = event.toJson();
+        Request request = new Request("POST", "events/_doc/" + event.getId());
 
+        request.setJsonEntity(event.toJson());
 
-        Mono<IndexResponse> response = client.index(request ->
+        Response response = null;
 
-        request.index(ELASTIC_INDEX)
-                .type(event.getType())
-                .id(event.getId())
-                .source(jsonObject, XContentType.JSON)
-                .setRefreshPolicy(IMMEDIATE));
+        try {
+            response=client.performRequest(request);
 
-        response
-                .doOnError( ex -> log.error("Error storing in elastic", ex))
-                .subscribe(indexResponse-> log.info("Event stored in elastic, response: " + indexResponse.toString()));
+            log.info("Elastic document created, status:" + response.getStatusLine());
+        } catch (IOException e) {
+            log.error("Elastic Search failed", e);
+        }
     }
 }
