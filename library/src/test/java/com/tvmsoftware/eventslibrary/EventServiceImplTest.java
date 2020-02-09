@@ -26,19 +26,22 @@ class EventServiceImplTest {
     @Autowired
     EventService service;
 
+    @Autowired
+    ApplicationCreatedListener listener;
+
     @Mock
     private Appender<ILoggingEvent> mockAppender;
 
     @Test
     void createBasicEvent() {
-        Event event = service.create(Event.class);
+        Event event = service.create(Event.class, this);
 
         assertThat(event.getType(), is(Event.class.getName()));
 
     }
     @Test
     void createApplicationEvent() {
-        ApplicationCreatedEvent event = service.create(ApplicationCreatedEvent.class);
+        ApplicationCreatedEvent event = service.create(ApplicationCreatedEvent.class, this);
 
         event.setApplicationType(ApplicationType.COMMERCIAL);
         event.setNumberOfApplicants(3);
@@ -55,9 +58,13 @@ class EventServiceImplTest {
 
         service.publish(event);
 
+        // it was logged
         List<ILoggingEvent> logsList = listAppender.list;
         assertThat(logsList.get(0).getMessage(), is(not(emptyString())));
         assertThat(logsList.get(0).getLevel().levelStr, is(Level.INFO.levelStr));
+
+        //spring event was published
+        assertThat(listener.getLastEvent().getId(), is(event.getId()));
     }
 
 }

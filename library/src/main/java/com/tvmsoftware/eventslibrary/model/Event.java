@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEvent;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -19,7 +20,7 @@ import java.util.UUID;
 @Setter
 @Slf4j
 @ToString
-public class Event {
+public class Event extends ApplicationEvent {
     @JsonProperty(required = true)
     protected String id;
     @JsonProperty(required = true)
@@ -33,7 +34,8 @@ public class Event {
     protected String userId;
     protected String correlationId;
 
-    public Event(){
+    public Event(Object source){
+        super(source);
         this.id = UUID.randomUUID().toString();
         this.time = LocalDateTime.now().toString();
     }
