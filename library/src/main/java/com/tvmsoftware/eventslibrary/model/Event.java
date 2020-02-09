@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.Schema;
 import org.springframework.context.ApplicationEvent;
 
 import java.time.LocalDateTime;
@@ -53,7 +54,26 @@ public class Event extends ApplicationEvent {
         return null;
     }
 
-    public static String generateAvroSchema(Class clazz){
+    public byte[] toAvro(){
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.findAndRegisterModules();
+
+        AvroSchema schema = new AvroSchema(Event.generateAvroSchema(this.getClass()));
+
+        byte[]  avroData = new byte[0];
+
+        try {
+            avroData = mapper.writer(schema)
+                    .writeValueAsBytes(this);
+        } catch (JsonProcessingException e) {
+            log.error("error serializing event " + this.toString() + " to avro", e);
+        }
+
+        return avroData;
+    }
+
+    public static Schema generateAvroSchema(Class clazz){
         ObjectMapper mapper = new ObjectMapper(new AvroFactory());
         mapper.findAndRegisterModules();
         AvroSchemaGenerator gen = new AvroSchemaGenerator();
@@ -64,7 +84,6 @@ public class Event extends ApplicationEvent {
         }
         AvroSchema schemaWrapper = gen.getGeneratedSchema();
 
-        org.apache.avro.Schema avroSchema = schemaWrapper.getAvroSchema();
-        return avroSchema.toString(true);
+        return schemaWrapper.getAvroSchema();
     }
 }
