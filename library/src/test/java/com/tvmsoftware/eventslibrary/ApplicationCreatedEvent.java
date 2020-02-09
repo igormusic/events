@@ -11,6 +11,10 @@ import lombok.ToString;
 public class ApplicationCreatedEvent extends Event {
     protected ApplicationType applicationType;
     protected Integer numberOfApplicants;
+
+    public ApplicationCreatedEvent(Object source) {
+        super(source);
+    }
 }
 
 

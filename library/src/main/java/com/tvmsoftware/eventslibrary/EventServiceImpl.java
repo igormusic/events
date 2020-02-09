@@ -18,10 +18,10 @@ public class EventServiceImpl implements EventService {
   }
 
   @Override
-  public <T extends Event> T create(Class<T> eventClass) {
+  public <T extends Event> T create(Class<T> eventClass, Object source) {
     T event = null;
     try {
-      event = eventClass.newInstance();
+      event = eventClass.getDeclaredConstructor(Object.class).newInstance(source);
     } catch (Exception e) {
       log.error("Error creating event type " + eventClass.getName(), e);
     }
